@@ -27,8 +27,7 @@ def make_new_group(
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Group already exists")
     
     group_id = new_group(db, current_user.id, group_name)
-    
-    
+
     background_tasks.add_task(create_group_table, group_id)
     
     return 'Ok'

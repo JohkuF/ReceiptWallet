@@ -7,16 +7,11 @@ from .get_db import get_db
 
 
 def new_group(db: Session, user_id: int, group_name: str) -> int:
-    
-    # Get id
-    last_id_query = db.query(func.max(Group.id))
-    last_id = db.execute(last_id_query).one()[0] or 0
 
-    last_group_id_query = db.query(func.max(Group.id))
+    last_group_id_query = db.query(func.max(Group.group_id))
     last_group_id = db.execute(last_group_id_query).one()[0] or 0
 
     group = Group(
-        id = last_id + 1,
         user_id = user_id,
         group_id= last_group_id + 1,
         group_name=group_name
@@ -39,7 +34,4 @@ def is_group(db: Session, user_id: int, group_name: str):
     if result:
         return True
     return False
-    
-    
-    #db.query()
     
