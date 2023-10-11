@@ -9,7 +9,7 @@ from .get_db import get_db
 
 def add_user(db: Session, username, email, hashed_password, disabled=False):
     # TODO Improve Error handling
-    try:        
+    try:
         last_id_query = db.query(func.max(User.id))
         last_id = db.execute(last_id_query).one()[0] or 0
 
@@ -24,7 +24,8 @@ def add_user(db: Session, username, email, hashed_password, disabled=False):
         db.add(new_user)
         db.commit()
     except IntegrityError:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, 'Username has already been taken')
-        
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Username has already been taken"
+        )
 
     return True

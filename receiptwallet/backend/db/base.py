@@ -1,15 +1,15 @@
 from sqlalchemy import (
-    create_engine,
     Column,
     Integer,
     String,
     Boolean,
     ForeignKey,
-    Table,
     MetaData,
     Float,
+    ForeignKey,
 )
-from sqlalchemy.orm import sessionmaker
+
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 from .get_db import engine
@@ -22,28 +22,38 @@ class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)
+    email = Column(String, unique=True)
     hashed_password = Column(String, index=True)
     disabled = Column(Boolean, default=False)
+
+    # One-to-many relationship with Group
+    groups = relationship("Group", back_populates="user")
 
 
 class Group(Base):
     __tablename__ = "groups"
+    id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True)
-    group_id = Column(Integer,unique=True,index=True, primary_key=True)
+    group_id = Column(Integer, index=True)
     group_name = Column(String)
 
+    # Many-to-one relationship with User
+    user = relationship("User", back_populates="groups")
 
-def create_group_table(group_id):
-    class GroupTable(Base):
-        __tablename__ = f"group_{group_id}"
-        id = Column(Integer, primary_key=True)
-        date = Column(String)
-        product = Column(String)
-        category = Column(String)
-        price = Column(Float)
-    
-    GroupTable.metadata.create_all(bind=engine)
-    
+    # One-to-Many relationship with Product
+    products = relationship("Product", back_populates="group")
 
-    return GroupTable
+
+class Product(Base):
+    __tablename__ = "products"
+    id = Column(Integer, primary_key=True)
+    group_id = Column(Integer, ForeignKey("groups.group_id"), index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+
+    date = Column(String)
+    product = Column(String)
+    category = Column(String)
+    price = Column(Float)
+
+    # Many-to-one relationship with Group
+    group = relationship("Group", back_populates="products")
