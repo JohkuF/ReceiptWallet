@@ -1,4 +1,5 @@
-from sqlalchemy import Table, text
+import json
+from sqlalchemy import Table, text, Row
 from fastapi import HTTPException, status
 from datetime import datetime
 
@@ -51,7 +52,6 @@ async def add_product(db: Session, user_id: int, group_name: str, product):
     To add product to db
     """
     try:
-
         # Get group_id by name
         id_query = (
             db.query(Group.group_id)
@@ -105,3 +105,25 @@ async def add_user(db: Session, user_id, username, group_name):
         db.commit()
 
         return "Ok"
+
+
+async def get_products(group_name: str, user_id: int, db: Session):
+    # Product.date, Product.product, Product.category, Product.price
+    query = (
+        db.query(Product.date, Product.product, Product.category, Product.price)
+        .join(Group)
+        .filter(Group.user_id == user_id)
+        .filter(Group.group_name == group_name)
+    )
+
+    products = db.execute(query).all()
+
+    return [
+        {
+            "date": product[0],
+            "product": product[1],
+            "category": product[2],
+            "price": product[3],
+        }
+        for product in products
+    ]

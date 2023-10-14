@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -16,7 +16,7 @@ from .schemas.token import TokenData
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_schema = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
 def verify_password(plain_password, hashed_password):
@@ -59,10 +59,24 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
     return encoded_jwt
 
+async def get_cookie_token(request: Request):
+    # Check if token in cookie
+    cookie_token = request.cookies.get('token')
+    print(type(oauth2_schema))
+    if not cookie_token:
+        return oauth2_schema
+    
+    return cookie_token
 
 async def get_current_user(
-    token: str = Depends(oauth2_schema), db: Session = Depends(get_db)
+    cookie_token: str = Depends(get_cookie_token),
+    token: str = Depends(oauth2_schema),
+    db: Session = Depends(get_db)
 ):
+    
+    if cookie_token:
+        token = cookie_token
+    
     credential_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate",

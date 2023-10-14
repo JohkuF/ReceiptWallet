@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, BackgroundTasks, Request
 from fastapi.exceptions import HTTPException
 
 
-from pydantic import SecretStr  
+from pydantic import SecretStr
 from sqlalchemy.orm.session import Session
 
 from ..schemas.product import Product
@@ -12,17 +12,32 @@ from ..db.user import get_user_groups
 from ..schemas.user import UserInDB, UserInDB
 from ..authenticate import get_current_active_user
 from ..authenticate import get_password_hash
-from ..db.groups import new_group, is_group, add_user
+from ..db.groups import new_group, is_group, add_user, get_products
 
 router = APIRouter()
 
 
 @router.get("/groups/")
 async def get_groups(
+    request: Request,
     current_user: UserInDB = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
     return await get_user_groups(db, current_user.id)
+
+
+# @router.get('/group/{group_name}/receipts')
+# @router.get('/group/{group_name}/bills')
+# @router.get('/group/{group_name}/info')
+
+
+@router.get("/group/{group_name}/products")
+async def get_group_products(
+    group_name,
+    current_user: UserInDB = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    return await get_products(group_name, current_user.id, db)
 
 
 @router.post("/group/new", status_code=status.HTTP_201_CREATED)

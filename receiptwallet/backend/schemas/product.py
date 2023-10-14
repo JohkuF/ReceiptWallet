@@ -8,9 +8,9 @@ class Product(BaseModel):
     product: str
     category: str
     price: float
-    
-    @field_validator('date')
+
+    @field_validator("date")
     def check_date(date):
-        if date == 'today':
+        if date == "today":
             return datetime.now().isoformat()
         return date
