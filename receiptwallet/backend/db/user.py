@@ -3,7 +3,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm.session import Session
 from sqlalchemy.exc import IntegrityError
 
-from .base import User
+from .base import User, Group
 from .get_db import get_db
 
 
@@ -29,3 +29,9 @@ def add_user(db: Session, username, email, hashed_password, disabled=False):
         )
 
     return True
+
+
+async def get_user_groups(db: Session, user_id: int):
+    query = db.query(Group.group_id, Group.group_name).filter(Group.user_id == user_id)
+    groups = db.execute(query).all()
+    return [{"groupId": row[0], "name": row[1]} for row in groups]

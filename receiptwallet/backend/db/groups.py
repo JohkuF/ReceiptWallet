@@ -12,11 +12,11 @@ from .base import Group, User, Product
 from .get_db import get_db
 
 
-def new_group(db: Session, user_id: int, group_name: str) -> int:
+async def new_group(db: Session, user_id: int, group_name: str) -> int:
     last_group_id_query = db.query(func.max(Group.group_id))
     last_group_id = db.execute(last_group_id_query).one()[0] or 0
 
-    id_query = db.query(func.max(Group.group_id))
+    id_query = db.query(func.max(Group.id))
     last_id = db.execute(id_query).one()[0] or 0
 
     group = Group(
@@ -29,10 +29,10 @@ def new_group(db: Session, user_id: int, group_name: str) -> int:
     db.add(group)
     db.commit()
 
-    return last_group_id + 1
+    return "Ok"
 
 
-def is_group(db: Session, user_id: int, group_name: str):
+async def is_group(db: Session, user_id: int, group_name: str):
     """
     Check if user in group that has same name
     """
@@ -50,7 +50,7 @@ def is_group(db: Session, user_id: int, group_name: str):
     return False
 
 
-def add_product(db: Session, user_id: int, group_name: str, product):
+async def add_product(db: Session, user_id: int, group_name: str, product):
     """
     To add product to db
     """
@@ -89,7 +89,7 @@ def add_product(db: Session, user_id: int, group_name: str, product):
         )
 
 
-def add_user(db: Session, user_id, username, group_name):
+async def add_user(db: Session, user_id, username, group_name):
     # Get user id
     query_id = db.query(User.id).filter(User.username == username)
     new_user_id = db.execute(query_id).one_or_none()
@@ -101,7 +101,7 @@ def add_user(db: Session, user_id, username, group_name):
     print(user_id, group_name)
     # get group id
     query_group_id = (
-        db.query(Group.id)
+        db.query(Group.group_id)
         .filter(Group.user_id == user_id)
         .filter(Group.group_name == group_name)
     )
