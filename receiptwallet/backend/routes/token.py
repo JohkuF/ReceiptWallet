@@ -17,7 +17,8 @@ router = APIRouter()
 @router.post("/token", response_model=Token)
 async def login_for_accesss_token(
     response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
     user = authenticate_user(db, form_data.username, form_data.password)
 
@@ -33,8 +34,8 @@ async def login_for_accesss_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
 
-
-    response.set_cookie(key="token",
-                        value=access_token,
-                        )
+    response.set_cookie(
+        key="token",
+        value=access_token,
+    )
     return {"access_token": access_token, "token_type": "Bearer"}

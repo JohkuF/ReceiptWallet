@@ -59,24 +59,25 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
     return encoded_jwt
 
+
 async def get_cookie_token(request: Request):
     # Check if token in cookie
-    cookie_token = request.cookies.get('token')
+    cookie_token = request.cookies.get("token")
     print(type(oauth2_schema))
     if not cookie_token:
         return oauth2_schema
-    
+
     return cookie_token
+
 
 async def get_current_user(
     cookie_token: str = Depends(get_cookie_token),
     token: str = Depends(oauth2_schema),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
-    
     if cookie_token:
         token = cookie_token
-    
+
     credential_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate",
