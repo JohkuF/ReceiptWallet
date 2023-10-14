@@ -20,7 +20,7 @@ metadata = MetaData()
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True)
     hashed_password = Column(String, index=True)
@@ -32,7 +32,7 @@ class User(Base):
 
 class Group(Base):
     __tablename__ = "groups"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True)
     group_id = Column(Integer, index=True)
     group_name = Column(String)
@@ -46,7 +46,7 @@ class Group(Base):
 
 class Product(Base):
     __tablename__ = "products"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     group_id = Column(Integer, ForeignKey("groups.group_id"), index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
 

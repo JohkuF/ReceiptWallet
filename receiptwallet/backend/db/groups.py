@@ -16,11 +16,7 @@ async def new_group(db: Session, user_id: int, group_name: str) -> int:
     last_group_id_query = db.query(func.max(Group.group_id))
     last_group_id = db.execute(last_group_id_query).one()[0] or 0
 
-    id_query = db.query(func.max(Group.id))
-    last_id = db.execute(id_query).one()[0] or 0
-
     group = Group(
-        id=last_id + 1,
         user_id=user_id,
         group_id=last_group_id + 1,
         group_name=group_name,
@@ -55,9 +51,6 @@ async def add_product(db: Session, user_id: int, group_name: str, product):
     To add product to db
     """
     try:
-        # Get next product id
-        id_query = db.query(func.max(Product.id))
-        last_id = db.execute(id_query).one()[0] or 0
 
         # Get group_id by name
         id_query = (
@@ -68,7 +61,6 @@ async def add_product(db: Session, user_id: int, group_name: str, product):
         group_id = db.execute(id_query).one()[0]
 
         new_product = Product(
-            id=last_id + 1,
             group_id=group_id,
             user_id=user_id,
             date=product.date,
@@ -94,11 +86,6 @@ async def add_user(db: Session, user_id, username, group_name):
     query_id = db.query(User.id).filter(User.username == username)
     new_user_id = db.execute(query_id).one_or_none()
 
-    # Get id
-    id_query = db.query(func.max(Group.id))
-    last_id = db.execute(id_query).one()[0]
-
-    print(user_id, group_name)
     # get group id
     query_group_id = (
         db.query(Group.group_id)
@@ -109,7 +96,6 @@ async def add_user(db: Session, user_id, username, group_name):
 
     if new_user_id:
         new_user = Group(
-            id=last_id + 1,
             user_id=new_user_id[0],
             group_id=group_id,
             group_name=group_name,
